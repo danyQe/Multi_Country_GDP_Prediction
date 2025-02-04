@@ -766,7 +766,7 @@ def eval_model(test_data, test_targets, model_path, best_params, device='cpu'):
 
 
 file_item_list = []
-for file_item in os.listdir('..//content/Multi_Country_GDP_Prediction/dataset/'):
+for file_item in os.listdir('/content/Multi_Country_GDP_Prediction/dataset/'):
     if ('LSTM_data_' in file_item):
         file_item_list.append(file_item)
     else:
@@ -781,8 +781,8 @@ for file_item in tqdm(file_item_list[:]):
 
     set_seed(1)
     
-    data_path = '..//content/Multi_Country_GDP_Prediction/dataset/' + file_item
-    label_path = '..//content/Multi_Country_GDP_Prediction/dataset/' + file_item.replace('LSTM_data', 'LSTM_label')
+    data_path = '/content/Multi_Country_GDP_Prediction/dataset/' + file_item
+    label_path = '/content/Multi_Country_GDP_Prediction/dataset/' + file_item.replace('LSTM_data', 'LSTM_label')
     
     
     data = torch.load(data_path)

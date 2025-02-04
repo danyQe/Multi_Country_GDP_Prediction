@@ -18,7 +18,9 @@ from utils.tools import del_files
 
 os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
-
+folder_path="/content/Multi_Country_GDP_Prediction/checkpoint_timellm"
+if not os.path.exists(folder_path):
+  os.makedirs(folder_path)
 def set_seed(seed):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
@@ -766,7 +768,7 @@ def eval_model(test_data, test_targets, model_path, best_params, device='cpu'):
 
 
 file_item_list = []
-for file_item in os.listdir('..//content/Multi_Country_GDP_Prediction/dataset/'):
+for file_item in os.listdir('/content/Multi_Country_GDP_Prediction/dataset/'):
     if ('LSTM_data_' in file_item):
         file_item_list.append(file_item)
     else:
@@ -781,8 +783,8 @@ for file_item in tqdm(file_item_list[:]):
 
     set_seed(1)
     
-    data_path = '..//content/Multi_Country_GDP_Prediction/dataset/' + file_item
-    label_path = '..//content/Multi_Country_GDP_Prediction/dataset/' + file_item.replace('LSTM_data', 'LSTM_label')
+    data_path = '/content/Multi_Country_GDP_Prediction/dataset/' + file_item
+    label_path = '/content/Multi_Country_GDP_Prediction/dataset/' + file_item.replace('LSTM_data', 'LSTM_label')
     
     
     data = torch.load(data_path)
@@ -835,13 +837,13 @@ for file_item in tqdm(file_item_list[:]):
     best_params = train_and_evaluate_final(train_data, test_data, train_targets, test_targets,
                              best_params, device)
     
-    model_path = 'checkpoints_timellm/' + file_item.replace('.pt', '_') + 'timellm_best_valid_model.pth'
+    model_path = folder_path + file_item.replace('.pt', '_') + 'timellm_best_valid_model.pth'
     best_params = eval_model(test_data, test_targets, model_path, best_params, device)
     best_params['train_data shape'] = ', '.join([str(x) for x in train_data.shape])
     best_params['test_data shape'] = ', '.join([str(x) for x in test_data.shape])
     best_params['train_targets shape'] = ', '.join([str(x) for x in train_targets.shape])
     best_params['test_targets shape'] = ', '.join([str(x) for x in test_targets.shape])
-    pd.DataFrame([best_params]).to_csv('checkpoints_timellm/' + file_item.replace('.pt', '_') + 'best_params_res.csv')
+    pd.DataFrame([best_params]).to_csv(folder_path + file_item.replace('.pt', '_') + 'best_params_res.csv')
     print('cost time: ', time.time() - start_time)
     print('\n===================Next=====================')
     

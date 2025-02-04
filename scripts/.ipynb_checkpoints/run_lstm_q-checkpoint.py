@@ -323,7 +323,7 @@ def hyperparameter_search(X, y, param_grid, k_folds=5, device='cpu'):
             best_params['record_best_epoch'] = record_best_epoch
             best_params['record_best_val_gdp_loss'] = record_best_val_gdp_loss
             best_params['record_best_fold'] = record_best_fold
-            model_save_path = 'checkpoints_lstm/'  + file_item.replace('.pt', '_') + 'lstm_best_valid_model.pth'
+            model_save_path = folder_path  + file_item.replace('.pt', '_') + 'lstm_best_valid_model.pth'
             torch.save(model.state_dict(), model_save_path)
             print(f"\nBest valid model saved to {model_save_path}")
             
@@ -447,7 +447,7 @@ def train_and_evaluate_final(train_data, test_data, train_targets, test_targets,
     print("Training complete!")
     
     # # 保存最终模型
-    model_save_path = 'checkpoints_lstm/'  + file_item.replace('.pt', '_') + 'lstm_best_final_model.pth'
+    model_save_path = folder_path  + file_item.replace('.pt', '_') + 'lstm_best_final_model.pth'
     torch.save(final_model.state_dict(), model_save_path)
     print(f"\nFinal model saved to {model_save_path}")
 
@@ -533,7 +533,7 @@ def eval_model(test_data, test_targets, model_path, best_params, device='cpu'):
 
 
 file_item_list = []
-for file_item in os.listdir('../dataset'):
+for file_item in os.listdir('/content/Multi_Country_GDP_Prediction/dataset'):
     if ('LSTM_data_' in file_item) and ('95-19' in file_item):
         file_item_list.append(file_item)
     else:
@@ -547,8 +547,8 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 for file_item in tqdm(file_item_list[:]):
     print(file_item)
     start_time = time.time()
-    data_path = '..//content/Multi_Country_GDP_Prediction/dataset/' + file_item
-    label_path = '..//content/Multi_Country_GDP_Prediction/dataset/' + file_item.replace('LSTM_data', 'LSTM_label')
+    data_path = '/content/Multi_Country_GDP_Prediction/dataset/' + file_item
+    label_path = '/content/Multi_Country_GDP_Prediction/dataset/' + file_item.replace('LSTM_data', 'LSTM_label')
     
     
     set_seed(1)
@@ -591,13 +591,13 @@ for file_item in tqdm(file_item_list[:]):
                              best_params, device)
     
     
-    model_path = 'checkpoints_lstm/' + file_item.replace('.pt', '_') + 'lstm_best_valid_model.pth'
+    model_path = folder_path + file_item.replace('.pt', '_') + 'lstm_best_valid_model.pth'
     best_params = eval_model(test_data, test_targets, model_path, best_params, device)
     best_params['train_data shape'] = ', '.join([str(x) for x in train_data.shape])
     best_params['test_data shape'] = ', '.join([str(x) for x in test_data.shape])
     best_params['train_targets shape'] = ', '.join([str(x) for x in train_targets.shape])
     best_params['test_targets shape'] = ', '.join([str(x) for x in test_targets.shape])
-    pd.DataFrame([best_params]).to_csv('checkpoints_lstm/' + file_item.replace('.pt', '_') + 'best_params_res.csv')
+    pd.DataFrame([best_params]).to_csv(folder_path + file_item.replace('.pt', '_') + 'best_params_res.csv')
     print('cost time: ', time.time() - start_time)
     print('\n===================Next=====================')
 
