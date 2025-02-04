@@ -10,7 +10,7 @@ import random
 import numpy as np
 import os
 from torch.utils.data import Dataset, DataLoader, TensorDataset, Subset
-from utils.metrics import metric
+from Multi_country_GDP_Prediction.utils.metrics import metric
 import itertools
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
@@ -486,7 +486,7 @@ def hyperparameter_search(X, y, param_grid, k_folds=5, device='cuda'):
             best_params['record_best_epoch'] = record_best_epoch
             best_params['record_best_val_gdp_loss'] = record_best_val_gdp_loss
             best_params['record_best_fold'] = record_best_fold
-            model_save_path = 'checkpoints_timellm/'  + file_item.replace('.pt', '_') + 'timellm_best_valid_model.pth'
+            model_save_path = folder_path  + file_item.replace('.pt', '_') + 'timellm_best_valid_model.pth'
             torch.save(model.state_dict(), model_save_path)
             print(f"\nBest valid model saved to {model_save_path}")
             
@@ -649,7 +649,7 @@ def train_and_evaluate_final(train_data, test_data, train_targets, test_targets,
     print("Complete!")
     
     # # 保存最终模型
-    model_save_path = 'checkpoints_timellm/'  + file_item.replace('.pt', '_') + 'timellm_best_final_model.pth'
+    model_save_path = folder_path  + file_item.replace('.pt', '_') + 'timellm_best_final_model.pth'
     torch.save(model.state_dict(), model_save_path)
     print(f"\nFinal model saved to {model_save_path}")
 

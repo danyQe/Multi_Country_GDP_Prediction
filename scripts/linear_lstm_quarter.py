@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from utils.metrics import metric
+from Multi_country_GDP_Prediction.utils.metrics import metric
 import os
 import torch
 import torch.nn as nn
