@@ -127,7 +127,7 @@ def get_linear_res(train_data, test_data, train_targets, test_targets):
 
 
 res_list = []
-for file_item in os.listdir('dataset'):
+for file_item in os.listdir('/content/Multi_Country_GDP_Prediction/dataset/'):
     if ('MLP_data_' in file_item) and ('_q_' in file_item):
         print(file_item)
     else:
@@ -135,8 +135,8 @@ for file_item in os.listdir('dataset'):
 # for file_item in ['MLP_data_q_95-19.pt']:
     temp_dict = {}
     start_time = time.time()
-    data_path = 'dataset/' + file_item
-    label_path = 'dataset/' + file_item.replace('MLP_data', 'MLP_label')
+    data_path = '/content/Multi_Country_GDP_Prediction/dataset/' + file_item
+    label_path = '/content/Multi_Country_GDP_Prediction/dataset/' + file_item.replace('MLP_data', 'MLP_label')
     
         
     set_seed(1)

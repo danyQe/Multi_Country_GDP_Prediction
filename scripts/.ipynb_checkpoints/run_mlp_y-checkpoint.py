@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from utils.metrics import metric
+from Multi_Country_GDP_Prediction.utils.metrics import metric
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -466,15 +466,15 @@ def eval_model(test_data, test_targets, model_path, best_params, device='cpu'):
     best_params['best val model mape'] = mape
     return best_params
 
-for file_item in os.listdir('dataset'):
+for file_item in os.listdir('/content/Multi_Country_GDP_Prediction/dataset/'):
     if ('MLP_data_' in file_item) and ('_y_' in file_item):
         print(file_item)
     else:
         continue
 # for file_item in ['MLP_data_q_95-19.pt']:
     start_time = time.time()
-    data_path = 'dataset/' + file_item
-    label_path = 'dataset/' + file_item.replace('MLP_data', 'MLP_label')
+    data_path = '/content/Multi_Country_GDP_Prediction/dataset/' + file_item
+    label_path = '/content/Multi_Country_GDP_Prediction/dataset/' + file_item.replace('MLP_data', 'MLP_label')
     
         
     set_seed(1)

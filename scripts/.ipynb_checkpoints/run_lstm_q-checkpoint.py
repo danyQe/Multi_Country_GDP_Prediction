@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from utils.metrics import metric
+from Multi_Country_GDP_Prediction.utils.metrics import metric
 import os
 import torch
 import torch.nn as nn
@@ -547,8 +547,8 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 for file_item in tqdm(file_item_list[:]):
     print(file_item)
     start_time = time.time()
-    data_path = '../dataset/' + file_item
-    label_path = '../dataset/' + file_item.replace('LSTM_data', 'LSTM_label')
+    data_path = '..//content/Multi_Country_GDP_Prediction/dataset/' + file_item
+    label_path = '..//content/Multi_Country_GDP_Prediction/dataset/' + file_item.replace('LSTM_data', 'LSTM_label')
     
     
     set_seed(1)
