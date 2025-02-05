@@ -254,8 +254,8 @@ def train_and_evaluate(model, train_loader, val_loader, criterion, optimizer, nu
 # 主函数，执行超参数搜索和交叉验证
 def hyperparameter_search(X, y, param_grid, k_folds=5, device='cpu'):
     # 将数据转换为TensorDataset
-    dataset = TensorDataset(torch.tensor(X, dtype=torch.float32),
-                            torch.tensor(y, dtype=torch.float32))
+    dataset = TensorDataset(torch.tensor(X, dtype=torch.float32).to(device),
+                            torch.tensor(y, dtype=torch.float32).to(device))
     
     # 创建超参数组合
     param_combinations = list(itertools.product(*param_grid.values()))
