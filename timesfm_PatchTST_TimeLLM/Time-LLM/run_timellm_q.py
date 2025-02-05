@@ -133,13 +133,10 @@ def no_train_loss(model, train_loader, criterion, args, device):
     with torch.no_grad():
         for i, (batch_x, batch_y) in enumerate(train_loader):
             iter_count += 1
-            batch_x = batch_x.float().to(device)
-            batch_y = batch_y.float().to(device)
-            batch_x_mark = torch.Tensor(np.zeros(2))
-            batch_y_mark = torch.Tensor(np.zeros(2))
-            batch_x_mark = batch_x_mark.float().to(device)
-            batch_y_mark = batch_y_mark.float().to(device)
-    
+            batch_x = batch_x.to(torch.bfloat16).to(device)
+            batch_y = batch_y.to(torch.bfloat16).to(device)
+            batch_x_mark = torch.Tensor(np.zeros(2)).to(torch.bfloat16).to(device)
+            batch_y_mark = torch.Tensor(np.zeros(2)).to(torch.bfloat16).to(device)
             # decoder input
             dec_inp = torch.zeros_like(batch_y[:, -args.pred_len:, :]).float().to(
                 device)
