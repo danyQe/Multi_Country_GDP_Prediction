@@ -100,14 +100,14 @@ class Model(nn.Module):
 
 
         elif configs.llm_model == 'GPT2':
-            self.gpt2_config = GPT2Config.from_pretrained('/ailab/user/xiehuaqing/Time-LLM/local_model/gpt2')
+            self.gpt2_config = GPT2Config.from_pretrained('openai-community/gpt2')
 
             self.gpt2_config.num_hidden_layers = configs.llm_layers
             self.gpt2_config.output_attentions = True
             self.gpt2_config.output_hidden_states = True
             try:
                 self.llm_model = GPT2Model.from_pretrained(
-                    '/ailab/user/xiehuaqing/Time-LLM/local_model/gpt2',
+                    'openai-community/gpt2',
                     trust_remote_code=True,
                     local_files_only=True,
                     config=self.gpt2_config,
@@ -115,7 +115,7 @@ class Model(nn.Module):
             except EnvironmentError:  # downloads model from HF is not already done
                 print("Local model files not found. wrong")
                 self.llm_model = GPT2Model.from_pretrained(
-                    '/ailab/user/xiehuaqing/Time-LLM/local_model/gpt2',
+                    'openai-community/gpt2',
                     trust_remote_code=True,
                     local_files_only=False,
                     config=self.gpt2_config,
@@ -123,7 +123,7 @@ class Model(nn.Module):
 
             try:
                 self.tokenizer = GPT2Tokenizer.from_pretrained(
-                    '/ailab/user/xiehuaqing/Time-LLM/local_model/gpt2',
+                    'openai-community/gpt2',
                     trust_remote_code=True,
                     local_files_only=True
                 )
