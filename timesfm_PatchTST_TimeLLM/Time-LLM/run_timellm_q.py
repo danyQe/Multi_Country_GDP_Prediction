@@ -10,7 +10,7 @@ import random
 import numpy as np
 import os
 from torch.utils.data import Dataset, DataLoader, TensorDataset, Subset
-from Multi_country_GDP_Prediction.utils.metrics import metric
+from utils.metrics import metric
 import itertools
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
