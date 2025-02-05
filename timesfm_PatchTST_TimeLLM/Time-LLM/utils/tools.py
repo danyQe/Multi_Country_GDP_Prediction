@@ -8,50 +8,6 @@ from tqdm import tqdm
 plt.switch_backend('agg')
 
 
-def RSE(pred, true):
-    return torch.sqrt(torch.sum((true - pred) ** 2)) / torch.sqrt(torch.sum((true - true.mean()) ** 2))
-
-
-def CORR(pred, true):
-    u = ((true - true.mean(0)) * (pred - pred.mean(0))).sum(0)
-    d = torch.sqrt(((true - true.mean(0)) ** 2 * (pred - pred.mean(0)) ** 2).sum(0))
-    d += 1e-12
-    return 0.01*(u / d).mean(-1)
-
-
-def MAE(pred, true):
-    return torch.mean(torch.abs(pred - true))
-
-
-def MSE(pred, true):
-    return torch.mean((pred - true) ** 2)
-
-
-def RMSE(pred, true):
-    return torch.sqrt(MSE(pred, true))
-
-
-def MAPE(pred, true):
-    return torch.mean(torch.abs((pred - true) / true))
-
-
-def MSPE(pred, true):
-    return torch.mean(torch.square((pred - true) / true))
-
-
-def metric(pred, true):
-    mae = MAE(pred, true)
-    mse = MSE(pred, true)
-    rmse = RMSE(pred, true)
-    mape = MAPE(pred, true)
-    mspe = MSPE(pred, true)
-    rse = RSE(pred, true)
-    corr = CORR(pred, true)
-
-    return mae, mse, rmse, mape, mspe, rse, corr
-
-
-
 def adjust_learning_rate(accelerator, optimizer, scheduler, epoch, args, printout=True):
     if args.lradj == 'type1':
         lr_adjust = {epoch: args.learning_rate * (0.5 ** ((epoch - 1) // 1))}
@@ -181,17 +137,11 @@ def del_files(dir_path):
 def vali(args, accelerator, model, vali_data, vali_loader, criterion, mae_metric):
     total_loss = []
     total_mae_loss = []
-    preds = []
-    trues = []
-    
     model.eval()
     with torch.no_grad():
-        for i, (batch_x, batch_y) in tqdm(enumerate(vali_loader)):
+        for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in tqdm(enumerate(vali_loader)):
             batch_x = batch_x.float().to(accelerator.device)
             batch_y = batch_y.float()
-            
-            batch_x_mark = torch.Tensor(np.zeros(2))
-            batch_y_mark = torch.Tensor(np.zeros(2))
 
             batch_x_mark = batch_x_mark.float().to(accelerator.device)
             batch_y_mark = batch_y_mark.float().to(accelerator.device)
@@ -226,21 +176,8 @@ def vali(args, accelerator, model, vali_data, vali_loader, criterion, mae_metric
 
             mae_loss = mae_metric(pred, true)
 
-            for item in outputs[:, -1].reshape(outputs[:, -1].shape[0]):
-                preds.append(item.detach().cpu().numpy())
-
-            for item in batch_y[:, -1].reshape(batch_y[:, -1].shape[0]):
-                trues.append(item.detach().cpu().numpy())
-
             total_loss.append(loss.item())
             total_mae_loss.append(mae_loss.item())
-
-    
-    preds = torch.Tensor(np.array(preds))
-    trues = torch.Tensor(np.array(trues))
-
-    mae, mse, rmse, mape, mspe, rse, corr = metric(preds, trues)
-    print('mae, mse, rmse, mape: ', mae, mse, rmse, mape)
 
     total_loss = np.average(total_loss)
     total_mae_loss = np.average(total_mae_loss)
@@ -291,8 +228,6 @@ def load_content(args):
         file = 'ETT'
     else:
         file = args.data
-    with open('.//content/Multi_Country_GDP_Prediction/dataset/prompt_bank/{0}.txt'.format(file), 'r') as f:
+    with open('./dataset/prompt_bank/{0}.txt'.format(file), 'r') as f:
         content = f.read()
     return content
-
-

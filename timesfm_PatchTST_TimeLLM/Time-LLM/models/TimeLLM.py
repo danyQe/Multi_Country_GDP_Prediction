@@ -8,8 +8,6 @@ from transformers import LlamaConfig, LlamaModel, LlamaTokenizer, GPT2Config, GP
 from layers.Embed import PatchEmbedding
 import transformers
 from layers.StandardNorm import Normalize
-from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
-
 
 transformers.logging.set_verbosity_error()
 
@@ -44,61 +42,44 @@ class Model(nn.Module):
 
         if configs.llm_model == 'LLAMA':
             # self.llama_config = LlamaConfig.from_pretrained('/mnt/alps/modelhub/pretrained_model/LLaMA/7B_hf/')
-            self.llama_config = LlamaConfig.from_pretrained('/ailab/user/xiehuaqing/Time-LLM/local_model/llama-7b')
+            self.llama_config = LlamaConfig.from_pretrained('huggyllama/llama-7b')
             self.llama_config.num_hidden_layers = configs.llm_layers
             self.llama_config.output_attentions = True
             self.llama_config.output_hidden_states = True
             try:
                 self.llm_model = LlamaModel.from_pretrained(
                     # "/mnt/alps/modelhub/pretrained_model/LLaMA/7B_hf/",
-                    '/ailab/user/xiehuaqing/Time-LLM/local_model/llama-7b',
+                    'huggyllama/llama-7b',
                     trust_remote_code=True,
                     local_files_only=True,
                     config=self.llama_config,
                     # load_in_4bit=True
                 )
             except EnvironmentError:  # downloads model from HF is not already done
-                print("Local model files not found. Something wrong.")
-
+                print("Local model files not found. Attempting to download...")
+                self.llm_model = LlamaModel.from_pretrained(
+                    # "/mnt/alps/modelhub/pretrained_model/LLaMA/7B_hf/",
+                    'huggyllama/llama-7b',
+                    trust_remote_code=True,
+                    local_files_only=False,
+                    config=self.llama_config,
+                    # load_in_4bit=True
+                )
             try:
                 self.tokenizer = LlamaTokenizer.from_pretrained(
                     # "/mnt/alps/modelhub/pretrained_model/LLaMA/7B_hf/tokenizer.model",
-                    '/ailab/user/xiehuaqing/Time-LLM/local_model/llama-7b',
+                    'huggyllama/llama-7b',
                     trust_remote_code=True,
                     local_files_only=True
                 )
             except EnvironmentError:  # downloads the tokenizer from HF if not already done
-                print("Local tokenizer files not found. Something wrong.")
-
-        elif configs.llm_model == 'GLM4':
-            self.glm_config = AutoConfig.from_pretrained('/ailab/user/xiehuaqing/test_folder/GLM-4/local_model/glm-4-9b-chat', trust_remote_code=True)
-            self.glm_config.num_hidden_layers = configs.llm_layers
-            self.glm_config.output_attentions = True
-            self.glm_config.output_hidden_states = True
-            try:
-                self.llm_model = AutoModelForCausalLM.from_pretrained(
-                    # "/mnt/alps/modelhub/pretrained_model/LLaMA/7B_hf/",
-                    '/ailab/user/xiehuaqing/test_folder/GLM-4/local_model/glm-4-9b-chat',
-                    trust_remote_code=True,
-                    local_files_only=True,
-                    config=self.glm_config,
-                    low_cpu_mem_usage=True
-                    # load_in_4bit=True
-                )
-            except EnvironmentError:  # downloads model from HF is not already done
-                print("Local model files not found. Something wrong!")
-
-            try:
-                self.tokenizer = AutoTokenizer.from_pretrained(
+                print("Local tokenizer files not found. Atempting to download them..")
+                self.tokenizer = LlamaTokenizer.from_pretrained(
                     # "/mnt/alps/modelhub/pretrained_model/LLaMA/7B_hf/tokenizer.model",
-                    '/ailab/user/xiehuaqing/test_folder/GLM-4/local_model/glm-4-9b-chat',
+                    'huggyllama/llama-7b',
                     trust_remote_code=True,
-                    local_files_only=True
+                    local_files_only=False
                 )
-            except EnvironmentError:  # downloads the tokenizer from HF if not already done
-                print("Local tokenizer files not found. Something wrong!")
-
-
         elif configs.llm_model == 'GPT2':
             self.gpt2_config = GPT2Config.from_pretrained('openai-community/gpt2')
 
@@ -113,7 +94,7 @@ class Model(nn.Module):
                     config=self.gpt2_config,
                 )
             except EnvironmentError:  # downloads model from HF is not already done
-                print("Local model files not found. wrong")
+                print("Local model files not found. Attempting to download...")
                 self.llm_model = GPT2Model.from_pretrained(
                     'openai-community/gpt2',
                     trust_remote_code=True,
@@ -128,8 +109,12 @@ class Model(nn.Module):
                     local_files_only=True
                 )
             except EnvironmentError:  # downloads the tokenizer from HF if not already done
-                print("Local tokenizer files not found. wrong")
-
+                print("Local tokenizer files not found. Atempting to download them..")
+                self.tokenizer = GPT2Tokenizer.from_pretrained(
+                    'openai-community/gpt2',
+                    trust_remote_code=True,
+                    local_files_only=False
+                )
         elif configs.llm_model == 'BERT':
             self.bert_config = BertConfig.from_pretrained('google-bert/bert-base-uncased')
 
@@ -178,8 +163,10 @@ class Model(nn.Module):
         for param in self.llm_model.parameters():
             param.requires_grad = False
 
-        # we make prompt descriptions as input
-        self.description = configs.description_add
+        if configs.prompt_domain:
+            self.description = configs.content
+        else:
+            self.description = 'The Electricity Transformer Temperature (ETT) is a crucial indicator in the electric power long-term deployment.'
 
         self.dropout = nn.Dropout(configs.dropout)
 
@@ -250,7 +237,7 @@ class Model(nn.Module):
         source_embeddings = self.mapping_layer(self.word_embeddings.permute(1, 0)).permute(1, 0)
 
         x_enc = x_enc.permute(0, 2, 1).contiguous()
-        enc_out, n_vars = self.patch_embedding(x_enc)
+        enc_out, n_vars = self.patch_embedding(x_enc.to(torch.bfloat16))
         enc_out = self.reprogramming_layer(enc_out, source_embeddings, source_embeddings)
         llama_enc_out = torch.cat([prompt_embeddings, enc_out], dim=1)
         dec_out = self.llm_model(inputs_embeds=llama_enc_out).last_hidden_state

@@ -1,4 +1,4 @@
-import torch as np
+import numpy as np
 
 
 def RSE(pred, true):
