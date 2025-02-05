@@ -295,7 +295,7 @@ def hyperparameter_search(X, y, param_grid, k_folds=5, device='cpu'):
                               num_layers=params['num_layers'],
                               output_dim=X.shape[-1],
                               dropout_rate=params['dropout_rate']).to(device)
-            criterion = loss_weight
+            criterion = loss_weight.to(device) if isinstance(loss_weight, torch.Tensor) else loss_weight
             optimizer = optim.AdamW(model.parameters(), lr=params['lr'], weight_decay=params['weight_decay'])
 
             # 训练和验证
