@@ -146,7 +146,7 @@ def no_train_loss(model, train_loader, criterion, args, device):
             dec_inp = torch.cat([batch_y[:, :args.label_len, :], dec_inp], dim=1).float().to(
                 device)
 
-            outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
+            outputs = model(batch_x.to(torch.bfloat16), batch_x_mark.to(torch.bfloat16), dec_inp.to(torch.bfloat16), batch_y_mark.to(torch.bfloat16))
     
             f_dim = -1 if args.features == 'MS' else 0
             outputs = outputs[:, -args.pred_len:, f_dim:]
