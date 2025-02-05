@@ -448,7 +448,7 @@ def hyperparameter_search(X, y, param_grid, k_folds=5, device='cuda'):
             else:
                 model = TimeLLM.Model(args).float()
                 
-            model = model.to(device)
+            model = model.to(device=device,dtype=torch.bfloat16)
             
             time_now = time.time()
             
@@ -580,7 +580,7 @@ def train_and_evaluate_final(train_data, test_data, train_targets, test_targets,
         model = DLinear.Model(args).float()
     else:
         model = TimeLLM.Model(args).float()
-    model = model.to(device)
+    model = model.to(device=device,dtype=torch.bfloat16)
 
     time_now = time.time()
     train_steps = len(train_loader)
@@ -733,7 +733,7 @@ def eval_model(test_data, test_targets, model_path, best_params, device='cpu'):
         model = DLinear.Model(args).float()
     else:
         model = TimeLLM.Model(args).float()
-    model = model.to(device)
+    model = model.to(device=device,dtype=torch.bfloat16)
     
     time_now = time.time()
     model_optim = optim.AdamW(model.parameters(), lr=args.learning_rate, weight_decay=0.01)
