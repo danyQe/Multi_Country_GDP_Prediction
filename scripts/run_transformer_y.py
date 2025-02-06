@@ -286,7 +286,7 @@ def hyperparameter_search(dataset, param_grid, k_folds=5, device='cpu'):
             best_params['record_best_epoch'] = record_best_epoch
             best_params['record_best_val_gdp_loss'] = record_best_val_gdp_loss
             best_params['record_best_fold'] = record_best_fold
-            model_save_path = folder_path  + file_item.replace('.pt', '_') + 'transformer_best_valid_model.pth'
+            model_save_path = folder_path  + file_item.replace('.pt', '_') + 'transformer_best_final_model.pth'
             torch.save(model.state_dict(), model_save_path)
             print(f"\nBest valid model saved to {model_save_path}")
             
@@ -330,7 +330,7 @@ def train_and_evaluate_final(train_dataset, test_dataset,
     # 训练最终模型
     train_losses = []
     test_losses = []
-    num_epochs = best_params['record_best_epoch']
+    num_epochs = 100
     for epoch in range(num_epochs):
         total_loss = 0
         for batch_data, batch_labels, masks in train_dataloader:
@@ -462,9 +462,7 @@ def eval_model(test_dataset, model_path, best_params, device='cpu'):
     return best_params
 
 
-file_item_list = ['train_dataset_mlp_13v_id_norm_6146_80-07.pth',
-                  'train_dataset_mlp_13v_id_norm_6146_13-19.pth',
-                  'train_dataset_mlp_13v_id_norm_6146_80-19.pth',
+file_item_list = ['train_dataset_mlp_13v_id_norm_6146_13-19.pth',
                   'train_dataset_light_year_14v_6146_13-19.pth',
                   'train_dataset_light_month_25v_6146_13-19.pth']
 
@@ -515,7 +513,7 @@ for file_item in tqdm(file_item_list[:]):
                              default_params, device)
     
     
-    model_path =  folder_path + file_item.replace('.pt', '_') + 'transformer_best_valid_model.pth'
+    model_path =  folder_path + file_item.replace('.pt', '_') + 'transformer_best_final_model.pth'
     best_params = eval_model(test_dataset, model_path, best_params, device)
     best_params['train_data len'] = str(len(train_dataset.data))
     best_params['test_data len'] = str(len(test_dataset.data))
