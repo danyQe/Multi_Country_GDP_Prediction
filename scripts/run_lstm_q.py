@@ -585,13 +585,22 @@ for file_item in tqdm(file_item_list[:]):
 
 
     # 执行超参数搜索
-    best_params, best_overall_loss = hyperparameter_search(train_data, train_targets, param_grid, k_folds=5, device=device)
+    # best_params, best_overall_loss = hyperparameter_search(train_data, train_targets, param_grid, k_folds=5, device=device)
     
-    best_params['best_overall_loss_average'] = best_overall_loss
-    
+    # best_params['best_overall_loss_average'] = best_overall_loss
+    default_params = {
+        'hidden_dim': 1024,
+        'num_layers': 2,
+        'dropout_rate': 0.1,
+        'lr': 0.0001,
+        'batch_size': 64,
+        'num_epochs': 500,  # Or 1000 if you want to train longer
+        'weight': 20,
+        'weight_decay': 0.01
+    }
     set_seed(1)
     best_params = train_and_evaluate_final(train_data, test_data, train_targets, test_targets,
-                             best_params, device)
+                             default_params, device)
     
     
     model_path = folder_path + file_item.replace('.pt', '_') + 'lstm_best_valid_model.pth'
