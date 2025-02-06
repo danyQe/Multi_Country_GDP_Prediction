@@ -370,7 +370,7 @@ def train_and_evaluate_final(train_data, test_data, train_targets, test_targets,
     test_losses = []
     train_gdp_losses = []
     test_gdp_losses = []
-    num_epochs = best_params['record_best_epoch']
+    num_epochs = 70
     for epoch in range(num_epochs):
         total_loss = 0
         total_gdp_loss = 0
@@ -450,7 +450,7 @@ def train_and_evaluate_final(train_data, test_data, train_targets, test_targets,
     print("Training complete!")
     
     # # 保存最终模型
-    model_save_path = folder_path  + file_item.replace('.pt', '_') + 'lstm_best_final_model.pth'
+    model_save_path = folder_path  +"/"+ file_item.replace('.pt', '_') + 'lstm_best_final_model.pth'
     torch.save(final_model.state_dict(), model_save_path)
     print(f"\nFinal model saved to {model_save_path}")
 
@@ -603,7 +603,7 @@ for file_item in tqdm(file_item_list[:]):
                              default_params, device)
     
     
-    model_path = folder_path + file_item.replace('.pt', '_') + 'lstm_best_valid_model.pth'
+    model_path = folder_path  +"/"+ file_item.replace('.pt', '_') + 'lstm_best_final_model.pth'
     best_params = eval_model(test_data, test_targets, model_path, best_params, device)
     best_params['train_data shape'] = ', '.join([str(x) for x in train_data.shape])
     best_params['test_data shape'] = ', '.join([str(x) for x in test_data.shape])

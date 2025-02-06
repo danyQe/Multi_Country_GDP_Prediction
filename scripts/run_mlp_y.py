@@ -14,7 +14,9 @@ from sklearn.metrics import mean_squared_error
 from tqdm import tqdm  # 进度条显示
 os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3,4"
 
-
+folder_path="/content/Multi_Country_GDP_Prediction/checkpoint_mlp_y/"
+if not os.path.exists(folder_path):
+  os.makedirs(folder_path)
 def set_seed(seed):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
@@ -508,21 +510,28 @@ for file_item in os.listdir('/content/Multi_Country_GDP_Prediction/dataset/'):
         'num_epochs': [1000],
         'weight_decay': [0.001]
     }
-    
+    default_params = {
+        'hidden_dim': [1024],
+        'dropout_rate': [0.1],
+        'lr': [0.001],
+        'batch_size': [64],
+        'num_epochs': [1000],
+        'weight_decay': [0.001]
+    }
     # 选择设备（如果有GPU可用，则使用GPU）
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
     # 执行超参数搜索
-    best_params, best_overall_loss = hyperparameter_search(train_data, train_targets, param_grid, k_folds=5, device=device)
+    # best_params, best_overall_loss = hyperparameter_search(train_data, train_targets, param_grid, k_folds=5, device=device)
         
-    best_params['best_overall_loss_average'] = best_overall_loss
+    # best_params['best_overall_loss_average'] = best_overall_loss
     
     set_seed(1)
     best_params = train_and_evaluate_final(train_data, test_data, train_targets, test_targets,
-                             best_params, device)
+                             default_params, device)
     
     set_seed(1)
-    model_path = 'checkpoints_mlp/' + file_item.replace('.pt', '_') + 'mlp_best_valid_model.pth'
+    model_path = folder_path + file_item.replace('.pt', '_') + 'mlp_best_valid_model.pth'
     best_params = eval_model(test_data, test_targets, model_path, best_params, device)
     best_params['train_data shape'] = ', '.join([str(x) for x in train_data.shape])
     best_params['test_data shape'] = ', '.join([str(x) for x in test_data.shape])
@@ -530,7 +539,7 @@ for file_item in os.listdir('/content/Multi_Country_GDP_Prediction/dataset/'):
     best_params['test_targets shape'] = ', '.join([str(x) for x in test_targets.shape])
     # print('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     # print(best_params)
-    pd.DataFrame([best_params]).to_csv('checkpoints_mlp/' + file_item.replace('.pt', '_') + 'best_params_res.csv')
+    pd.DataFrame([best_params]).to_csv(folder_path + file_item.replace('.pt', '_') + 'best_params_res.csv')
     print('cost time: ', time.time() - start_time)
     print('\n===================Next=====================')
 

@@ -1,0 +1,2 @@
+,hidden_dim,num_layers,dropout_rate,lr,batch_size,num_epochs,weight,weight_decay,final model mae,final model mse,final model rmse,final model mape,best val model mae,best val model mse,best val model rmse,best val model mape,train_data shape,test_data shape,train_targets shape,test_targets shape
+0,1024,2,0.1,0.0001,64,500,20,0.01,tensor(0.6227),tensor(0.8359),tensor(0.9143),tensor(8353.6367),tensor(0.6227),tensor(0.8359),tensor(0.9143),tensor(8353.6367),"1591, 8, 1","168, 8, 1","1591, 1","168, 1"
