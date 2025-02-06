@@ -119,8 +119,8 @@ def no_train_loss(model, train_loader, criterion, device):
         total_loss += loss.item() * batch_data.size(0)
         total_gdp_loss += gdp_loss.item() * batch_data.size(0)
 
-    total_loss = total_loss/len(train_loader.dataset)
-    total_gdp_loss = total_gdp_loss/len(train_loader.dataset)
+    total_loss = total_loss/(len(train_loader.dataset)+1e-6)
+    total_gdp_loss = total_gdp_loss/(len(train_loader.dataset)+1e-6)
     return total_loss, total_gdp_loss
 
 
@@ -159,8 +159,8 @@ def train_and_evaluate(model, train_loader, val_loader, criterion, optimizer, nu
             running_loss += loss.item() * inputs.size(0)
             running_gdp_loss += gdp_loss.item() * inputs.size(0)
         
-        epoch_train_loss = running_loss / len(train_loader.dataset)
-        epoch_train_gdp_loss = running_gdp_loss / len(train_loader.dataset)
+        epoch_train_loss = running_loss / (len(train_loader.dataset)+1e-6)
+        epoch_train_gdp_loss = running_gdp_loss / (len(train_loader.dataset)+1e-6)
         
         # 验证阶段
         model.eval()
@@ -180,8 +180,8 @@ def train_and_evaluate(model, train_loader, val_loader, criterion, optimizer, nu
                 running_val_loss += loss.item() * inputs.size(0)
                 running_val_gdp_loss += gdp_loss.item() * inputs.size(0)
         
-        epoch_val_loss = running_val_loss / len(val_loader.dataset)
-        epoch_val_gdp_loss = running_val_gdp_loss / len(val_loader.dataset)
+        epoch_val_loss = running_val_loss / (len(val_loader.dataset)+1e-6)
+        epoch_val_gdp_loss = running_val_gdp_loss / (len(val_loader.dataset)+1e-6)
         
         # 如果当前验证损失小于最佳损失，则更新最佳模型权重和最佳 epoch
         if epoch_val_gdp_loss < best_val_gdp_loss:
@@ -306,7 +306,7 @@ def train_and_evaluate_final(train_data, test_data, train_targets, test_targets,
     test_losses = []
     train_gdp_losses = []
     test_gdp_losses = []
-    num_epochs = best_params['record_best_epoch']
+    num_epochs = 100
     for epoch in range(num_epochs):
         total_loss = 0
         total_gdp_loss = 0
@@ -367,8 +367,8 @@ def train_and_evaluate_final(train_data, test_data, train_targets, test_targets,
                 for item in batch_targets:
                     trues.append(item.detach().cpu().numpy())           
             
-            test_loss = test_loss / len(test_dataloader.dataset)
-            test_gdp_loss = test_gdp_loss / len(test_dataloader.dataset)
+            test_loss = test_loss /(len(test_dataloader.dataset)+1e-6)
+            test_gdp_loss = test_gdp_loss / (len(test_dataloader.dataset)+1e-6)
             
             test_losses.append(test_loss)
             test_gdp_losses.append(test_gdp_loss)
@@ -383,7 +383,7 @@ def train_and_evaluate_final(train_data, test_data, train_targets, test_targets,
     print("Training complete!")
     
     # # 保存最终模型
-    model_save_path = 'checkpoints_mlp/'  + file_item.replace('.pt', '_') + 'mlp_best_final_model.pth'
+    model_save_path = folder_path  + file_item.replace('.pt', '_') + 'mlp_best_final_model.pth'
     torch.save(final_model.state_dict(), model_save_path)
     print(f"\nFinal model saved to {model_save_path}")
 
@@ -446,8 +446,8 @@ def eval_model(test_data, test_targets, model_path, best_params, device='cpu'):
                 trues.append(item.detach().cpu().numpy())     
         
         
-        test_loss = test_loss / len(test_dataloader.dataset)
-        test_gdp_loss = test_gdp_loss / len(test_dataloader.dataset)
+        test_loss = test_loss / (len(test_dataloader.dataset)+1e-6)
+        test_gdp_loss = test_gdp_loss / (len(test_dataloader.dataset)+1e-6)
         
         test_losses.append(test_loss)
         test_gdp_losses.append(test_gdp_loss)
@@ -527,7 +527,7 @@ for file_item in os.listdir('/content/Multi_Country_GDP_Prediction/dataset/'):
                              default_params, device)
     
     set_seed(1)
-    model_path = folder_path + file_item.replace('.pt', '_') + 'mlp_best_valid_model.pth'
+    model_path = folder_path + file_item.replace('.pt', '_') + 'mlp_best_final_model.pth'
     best_params = eval_model(test_data, test_targets, model_path, best_params, device)
     best_params['train_data shape'] = ', '.join([str(x) for x in train_data.shape])
     best_params['test_data shape'] = ', '.join([str(x) for x in test_data.shape])
