@@ -13,7 +13,9 @@ from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
 from tqdm import tqdm  
 
-os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3,4"
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
+torch.backends.cudnn.deterministic = False
+torch.backends.cudnn.benchmark = True
 folder_path="/content/Multi_Country_GDP_Prediction/checkpoint_lstm"
 if not os.path.exists(folder_path):
   os.makedirs(folder_path)
@@ -24,8 +26,6 @@ def set_seed(seed):
     torch.cuda.manual_seed_all(seed)  
     np.random.seed(seed)
     random.seed(seed)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
 
 
 # 计算最小值和最大值, 并进行归一化
