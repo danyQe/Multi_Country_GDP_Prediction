@@ -155,7 +155,7 @@ def evaluate(model, test_loader, criterion, device):
             outputs = model(features, masks)
             loss = criterion(outputs.squeeze(), labels)
             total_loss += loss.item()
-    return total_loss / len(test_loader)
+    return total_loss /(len(test_loader)+1e-6)
 
 
 
@@ -188,7 +188,7 @@ def train_and_evaluate(model, train_loader, val_loader, criterion, optimizer, nu
             optimizer.step()
             running_loss += loss.item() * data.size(0)
         
-        epoch_train_loss = running_loss / len(train_loader.dataset)
+        epoch_train_loss = running_loss / (len(train_loader.dataset)+1e-6)
         
         # 验证阶段
         model.eval()
@@ -286,7 +286,7 @@ def hyperparameter_search(dataset, param_grid, k_folds=5, device='cpu'):
             best_params['record_best_epoch'] = record_best_epoch
             best_params['record_best_val_gdp_loss'] = record_best_val_gdp_loss
             best_params['record_best_fold'] = record_best_fold
-            model_save_path = 'checkpoints_transformer/'  + file_item.replace('.pt', '_') + 'transformer_best_valid_model.pth'
+            model_save_path = folder_path  + file_item.replace('.pt', '_') + 'transformer_best_valid_model.pth'
             torch.save(model.state_dict(), model_save_path)
             print(f"\nBest valid model saved to {model_save_path}")
             
@@ -350,7 +350,7 @@ def train_and_evaluate_final(train_dataset, test_dataset,
     
             total_loss += loss.item() * batch_data.size(0)
     
-        train_loss = total_loss/len(train_dataloader.dataset)
+        train_loss = total_loss/(len(train_dataloader.dataset)+1e-6)
         train_losses.append(train_loss)
     
         preds = []
@@ -373,8 +373,8 @@ def train_and_evaluate_final(train_dataset, test_dataset,
                     preds.append(item.item())
                 for item in batch_targets:
                     trues.append(item.item())      
-            # print(len(test_dataloader.dataset))
-            test_loss = test_loss / len(test_dataloader.dataset)
+            # print((len(test_dataloader.dataset)+1e-6))
+            test_loss = test_loss / (len(test_dataloader.dataset)+1e-6)
             test_losses.append(test_loss)
     
         preds = torch.Tensor(np.array(preds))
@@ -386,7 +386,7 @@ def train_and_evaluate_final(train_dataset, test_dataset,
     print("Training complete!")
     
     # # 保存最终模型
-    model_save_path = 'checkpoints_transformer/'  + file_item.replace('.pt', '_') + 'transformer_best_final_model.pth'
+    model_save_path = folder_path  + file_item.replace('.pt', '_') + 'transformer_best_final_model.pth'
     torch.save(final_model.state_dict(), model_save_path)
     print(f"\nFinal model saved to {model_save_path}")
 
@@ -443,7 +443,7 @@ def eval_model(test_dataset, model_path, best_params, device='cpu'):
                 trues.append(item.item())     
         
         
-        test_loss = test_loss / len(test_dataloader.dataset)
+        test_loss = test_loss / (len(test_dataloader.dataset)+1e-6)
         test_losses.append(test_loss)
 
     
@@ -494,14 +494,14 @@ for file_item in tqdm(file_item_list[:]):
         'weight_decay': [0.01]
     }
     default_params = {
-        'embed_dim': [1024],
-        'repeat_dim': [10],
-        'num_heads': [8],
-        'num_layers': [3],
-        'lr': [0.0001],
-        'batch_size': [64],
-        'num_epochs': [1000],
-        'weight_decay': [0.01]
+        'embed_dim': 1024,
+        'repeat_dim': 10,
+        'num_heads': 8,
+        'num_layers': 3,
+        'lr': 0.001,
+        'batch_size': 64,
+        'num_epochs': 1000,
+        'weight_decay': 0.01
     }
 
 
