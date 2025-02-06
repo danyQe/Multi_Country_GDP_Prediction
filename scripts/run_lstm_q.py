@@ -254,6 +254,7 @@ def train_and_evaluate(model, train_loader, val_loader, criterion, optimizer, nu
 # 主函数，执行超参数搜索和交叉验证
 def hyperparameter_search(X, y, param_grid, k_folds=5, device='cpu'):
     # 将数据转换为TensorDataset
+    print("device:",device)
     dataset = TensorDataset(torch.tensor(X, dtype=torch.float32).to(device),
                             torch.tensor(y, dtype=torch.float32).to(device))
     
@@ -572,12 +573,12 @@ for file_item in tqdm(file_item_list[:]):
     
     # 定义超参数网格
     param_grid = {
-        'hidden_dim': [512, 1024, 2048],
-        'num_layers': [1, 2, 3],
+        'hidden_dim': [512, 1024],
+        'num_layers': [1, 2],
         'dropout_rate': [0.1],
-        'lr': [0.001, 0.0001, 0.00001],
-        'batch_size': [64],
-        'num_epochs': [1000],
+        'lr': [0.001, 0.0001],
+        'batch_size': [64,128],
+        'num_epochs': [100],
         'weight': [20, 60],
         'weight_decay': [0.01]
     }
